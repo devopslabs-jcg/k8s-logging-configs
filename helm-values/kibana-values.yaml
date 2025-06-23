@@ -1,0 +1,39 @@
+# Kibana Helm Chart의 values.yaml을 기반으로 작성
+# 참고: https://github.com/elastic/helm-charts/blob/main/kibana/values.yaml
+
+replicaCount: 1
+
+elasticsearchHosts: "http://elastic-logging-cluster-es-http:9200" # Elasticsearch 서비스 주소 (기본 Helm Chart 이름 규칙)
+# 위 주소는 Elasticsearch Helm Chart의 기본 서비스 이름 규칙에 따라 생성됩니다.
+# 만약 Elasticsearch의 clusterName 등을 변경했다면, 해당 서비스 이름에 맞춰야 합니다.
+# 일반적으로 '클러스터이름-es-http' 형태입니다. (예: elastic-logging-cluster-es-http)
+
+# Kibana 리소스 설정
+resources:
+  requests:
+    cpu: "200m"
+    memory: "1Gi"
+  limits:
+    cpu: "500m"
+    memory: "2Gi"
+
+# Kibana 접근을 위한 Service 설정
+service:
+  type: LoadBalancer # 외부에서 Kibana에 접근하기 위해 LoadBalancer 사용 (클라우드 환경)
+  # NodePort를 사용하거나, Ingress Controller를 사용한다면 type: ClusterIP로 변경
+  # type: NodePort
+  # nodePort: 30000 # 30000 이상의 포트 (선택 사항)
+
+# Ingress 설정 (LoadBalancer 대신 Ingress를 사용할 경우)
+# ingress:
+#   enabled: true
+#   className: "nginx" # 사용하는 Ingress Controller 클래스
+#   annotations:
+#     kubernetes.io/ingress.class: nginx
+#   hosts:
+#     - kibana.yourdomain.com # 실제 도메인으로 변경
+
+# X-Pack 보안 비활성화 (개발/테스트용)
+# xpack:
+#   security:
+#     enabled: false

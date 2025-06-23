@@ -1,0 +1,5 @@
+# k8s-logging-configs/kubernetes/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logging # 사용할 네임스페이스 이름

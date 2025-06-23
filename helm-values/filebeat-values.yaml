@@ -1,0 +1,61 @@
+# Filebeat Helm Chart의 values.yaml을 기반으로 작성
+# 참고: https://github.com/elastic/helm-charts/blob/main/filebeat/values.yaml
+
+daemonset:
+  enabled: true # 각 노드에 Filebeat Pod를 배포 (로그 수집에 필수)
+
+# Filebeat가 로그를 전송할 Elasticsearch 설정
+elasticsearch:
+  host: "elastic-logging-cluster-es-http" # Elasticsearch 서비스 주소
+  port: 9200
+  # username: "elastic" # 보안 활성화 시
+  # password: "your-password" # 보안 활성화 시
+
+# Filebeat가 수집할 모듈 활성화
+# Kubernetes 로그 수집을 위해 kubernetes 모듈 활성화
+# 다른 시스템 로그(system), Nginx, Apache 등도 필요에 따라 활성화 가능
+filebeatConfig:
+  filebeat.yml: |
+    filebeat.inputs:
+    - type: container
+      paths:
+        - /var/log/containers/*.log # 컨테이너 로그 경로 (Kubernetes 기본 경로)
+      processors:
+      - add_kubernetes_metadata:
+          in_cluster: true
+    output.elasticsearch:
+      hosts: ["${ES_HOST}:${ES_PORT}"]
+
+# Kubernetes 노드의 로그 디렉토리를 Filebeat 컨테이너에 마운트
+volumeMounts:
+  - name: varlogcontainers
+    mountPath: /var/log/containers
+  - name: varlogpods
+    mountPath: /var/log/pods
+  - name: varlibdockercontainers
+    mountPath: /var/lib/docker/containers
+
+volumes:
+  - name: varlogcontainers
+    hostPath:
+      path: /var/log/containers
+  - name: varlogpods
+    hostPath:
+      path: /var/log/pods
+  - name: varlibdockercontainers
+    hostPath:
+      path: /var/lib/docker/containers
+
+# RBAC 설정 (필수)
+rbac:
+  create: true
+  serviceAccountName: filebeat
+
+# 리소스 설정
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "200m"
+    memory: "512Mi"
