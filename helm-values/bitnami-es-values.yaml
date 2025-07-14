@@ -1,0 +1,26 @@
+# bitnami-es-values.yaml
+# --- Bitnami 차트용 설정 ---
+
+# 마스터 노드만 1개 사용하고, 데이터/인제스트 노드는 사용하지 않음 (단일 노드 구성)
+master:
+  replicas: 1
+  # !! 스토리지 비활성화 !!
+  persistence:
+    enabled: false
+  # 자원 요청량
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+data:
+  replicas: 0
+ingest:
+  replicas: 0
+
+# 클러스터 전체 설정
+global:
+  kibanaEnabled: false
