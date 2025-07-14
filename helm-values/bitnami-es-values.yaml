@@ -7,7 +7,6 @@ master:
   # !! 스토리지 비활성화 !!
   persistence:
     enabled: false
-  # 자원 요청량
   resources:
     requests:
       memory: "1Gi"
